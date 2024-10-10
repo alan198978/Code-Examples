@@ -26,7 +26,7 @@ $seller_data = json_encode([
     'user_name' => $user_name,
     'product_name' => $product_name,
     'product_price' => $product_price,
-    'seller_password' => 'SellerSecretPassword123',//金流給賣家用戶的固定密碼。
+    'seller_password' => 'SellerSecretPassword123',//模擬賣家用戶的固定密碼。
     'unique_id' => $unique_id //唯一識別碼，每次隨機產生。
 ]);
 
