@@ -17,7 +17,7 @@ $product_name = 'Product X';
 $product_price = '100';
 $paid = false;
 
-$stmt = $db->prepare("INSERT INTO 測試資料表 (訂單編號, 用戶姓名, 商品名稱, 訂單總價, 唯一識別碼, 已付款) VALUES (?, ?, ?, ?, ?)");
+$stmt = $db->prepare("INSERT INTO 測試資料表 (訂單編號, 用戶姓名, 商品名稱, 訂單總價, 已付款) VALUES (?, ?, ?, ?, ?)");
 $stmt->execute([$order_id, $user_name, $product_name, $product_price, $paid]);
 
 // 創建一個關聯數組包含商品信息和賣家認證
