@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include 'db_connect.php';
+include 'db_connect.php'; //連接資料庫腳本
 
 // 產生唯一識別碼
 $識別碼 = bin2hex(random_bytes(16));
