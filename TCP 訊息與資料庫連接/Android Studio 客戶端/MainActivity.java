@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button 發送用戶資料按鈕; //負責用戶資料。
 
     private Socket socket; //用於連接伺服器的 TCP 套接字。
-    private String 伺服器位址 = "192.168.18.4"; //124.218.224.31
+    private String 伺服器位址 = "192.168.18.4"; //124.XXX.XXX.31
     private int port = 5000;
     private OutputStream outputStream; //透過此資料流發送資料至伺服器。
     //Handler 用於更新 UI，因為網路操作通常是在子執行緒中進行，無法直接修改 UI 元素。
