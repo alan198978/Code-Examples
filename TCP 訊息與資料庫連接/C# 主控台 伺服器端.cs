@@ -99,7 +99,7 @@ class Program
                         {
                             連接.Open();
                             string sql指令 = @"INSERT INTO 測試資料表 (帳號, 密碼, 電話) 
-                           VALUES (@帳號, @密碼, @電話)"; // 用參數導入的方式寫入，避免SQL注入攻擊。
+                           VALUES (@帳號, @密碼, @電話)"; //避免SQL注入攻擊。
 
                             using (SQLiteCommand 指令 = new SQLiteCommand(sql指令, 連接))
                             {
