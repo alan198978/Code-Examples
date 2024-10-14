@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -13,11 +13,9 @@ class Server
         TcpListener server = new TcpListener(IPAddress.Any, port);
 
         server.Start();
-        Console.WriteLine("伺服器已啟動，請輸入要傳輸的檔案路徑：");
+        Console.WriteLine("伺服器已啟動!");
 
-        // 讓管理員輸入檔案路徑
-        string 檔案路徑 = Console.ReadLine();
-        string 檔案名稱 = Path.GetFileName(檔案路徑); // 提取檔案名稱
+
 
         while (true)
         {
@@ -34,6 +32,10 @@ class Server
 
             if (請求字 == "1")
             {
+                Console.WriteLine("請輸入要傳輸的檔案路徑：");
+                // 讓管理員輸入檔案路徑
+                string 檔案路徑 = Console.ReadLine();
+                string 檔案名稱 = Path.GetFileName(檔案路徑); // 提取檔案名稱
                 // 客戶端要求下載檔案
                 if (File.Exists(檔案路徑))
                 {
@@ -58,7 +60,10 @@ class Server
                     Console.WriteLine("檔案不存在，無法傳送。");
                 }
             }
+            else if(請求字 == "2")
+            {
 
+            }
             client.Close();
         }
     }
