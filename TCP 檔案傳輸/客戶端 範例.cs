@@ -67,7 +67,7 @@ class Client
 
                     client.Close();
                 }
-                else if(userInput2 == "1")
+                else if(userInput2 == "2")
                 {
 
                 }
