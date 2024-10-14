@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -52,7 +52,7 @@ class Client
                     byte[] 檔案資料內容 = new byte[fileSize];
                     int bytesReceived = 0; //每次最初設定為 0，因為在開始接收之前，我們還沒有接收到任何資料。
 
-                    while (bytesReceived < fileSize)
+                    while (bytesReceived < fileSize) //*註解1(請拉到最底下)
                     {
                         bytesReceived += stream.Read(檔案資料內容, bytesReceived, fileSize - bytesReceived);
                     }
@@ -66,6 +66,10 @@ class Client
                     Console.WriteLine("檔案已成功下載到：" + 儲存路徑);
 
                     client.Close();
+                }
+                else if(userInput2 == "1")
+                {
+
                 }
                 else
                 {
