@@ -8,7 +8,7 @@ class Client
     static void Main(string[] args)
     {
         // 連接伺服器端 IP 和埠號
-        string serverIp = "192.168.18.4";
+        string serverIp = "192.XXX.XXX.XX";
         int port = 5000;
 
         Console.WriteLine("請輸入 'y' 來建立伺服器的連接");
