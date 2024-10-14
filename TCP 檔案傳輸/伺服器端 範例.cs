@@ -36,10 +36,10 @@ class Server
                 // 讓管理員輸入檔案路徑
                 string 檔案路徑 = Console.ReadLine();
                 string 檔案名稱 = Path.GetFileName(檔案路徑); // 提取檔案名稱
-                // 客戶端要求下載檔案
-                if (File.Exists(檔案路徑))
+
+                if (File.Exists(檔案路徑)) //檢查檔案路徑是否存在
                 {
-                    byte[] 檔案資料內容 = File.ReadAllBytes(檔案路徑);
+                    byte[] 檔案資料內容 = File.ReadAllBytes(檔案路徑); //讀取檔案的所有內容並將其儲存在一個 byte[] 陣列中。
                     byte[] fileNameBytes = Encoding.ASCII.GetBytes(檔案名稱); // 檔案名稱的 byte 格式
 
                     // 傳送檔案名稱長度及檔案名稱給客戶端
