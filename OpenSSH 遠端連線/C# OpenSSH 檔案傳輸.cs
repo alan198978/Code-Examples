@@ -10,9 +10,9 @@ namespace SFTPFileTransferExample
     {
         static void Main(string[] args)
         {
-            string host = "124.218.224.31"; //SSH Server IP地址。
+            string host = "124.XXX.XXX.XX"; //SSH Server IP地址。
             int port = 22; //SSH Server預設端口為22。
-            string username = "alanlin"; //遠端主機的用戶名稱
+            string username = "XXXXXX"; //遠端主機的用戶名稱
 
             Console.Write("輸入伺服器端用戶密碼： ");
             string password = 讀取密碼函數();
