@@ -1,17 +1,41 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SQLite; 
+using System.Data.SQLite; //導入必要命名空間
+using System.Security.Cryptography; // 加入此命名空間用於雜湊加密
 
 class Program
 {
-    // 保存所有連接的客戶端
+    // 保存所有連接的客戶端, 用來將每個連接的客戶端的暱稱（string）與其對應的 TcpClient 進行配對
     private static Dictionary<string, TcpClient> 客戶端列表 = new Dictionary<string, TcpClient>();
 
-    static string 資料庫位址字串 = @"Data Source=C:\Users\使用者名稱\Desktop\測試資料庫.db;";
+    static string 資料庫位址字串 = @"Data Source=C:\Users\wechli\Desktop\資料庫\測試資料庫.db;";
+
+    // 密碼雜湊方法
+    private static string 加密密碼(string 原始密碼)
+    {
+        using (SHA256 sha256 = SHA256.Create())
+        {
+            // 將密碼轉換成 byte 陣列
+            byte[] bytes = Encoding.UTF8.GetBytes(原始密碼);
+
+            // 進行雜湊運算
+            byte[] hash = sha256.ComputeHash(bytes);
+
+            // 將雜湊結果轉換成十六進制字串
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                result.Append(hash[i].ToString("x2")); // x2 表示轉換為兩位數的十六進制
+            }
+
+            return result.ToString();
+        }
+    }
+
     static async Task Main(string[] args)
     {
         const int port = 5000;
@@ -23,16 +47,16 @@ class Program
             listener.Start(); //啟動監聽器，開始等待客戶端連接。
             Console.WriteLine($"TCP Server is running on port {port}...");
 
-            // 啟動一個獨立任務來處理伺服器輸入，允許伺服器管理員手動輸入來向特定客戶端發送訊息。
-            _ = Task.Run(() => HandleServerInput());
+            // 啟動一個獨立任務來處理伺服器輸入，允許伺服器管理員（您）手動輸入來向特定客戶端發送訊息。
+            _ = Task.Run(() => HandleServerInput()); //註解*2 (請拉到最底下)
 
             while (true)
             {
-                // AcceptTcpClientAsync()：等待新的客戶端連線。一旦有新的客戶端連接，伺服器就會打印 "Client connected."。
+                // AcceptTcpClientAsync()：伺服器會異步等待新的客戶端連線。一旦有新的客戶端連接，伺服器就會打印 "Client connected."。
                 var client = await listener.AcceptTcpClientAsync();
                 Console.WriteLine("Client connected.");
 
-                // 客戶端訊息處理(client)：每當有新客戶端連接時，伺服器會啟動一個新的執行緒來處理該客戶端的通訊。
+                // 異步客戶端訊息處理(client)：每當有新客戶端連接時，伺服器會啟動一個新的執行緒來處理該客戶端的通訊。
                 _ = Task.Run(() => 異步客戶端訊息處理(client));
             }
         }
@@ -49,16 +73,17 @@ class Program
     private static async Task 異步客戶端訊息處理(TcpClient client)
     {
         using (var networkStream = client.GetStream()) //.GetStream()將指定某一客戶端來收發網路流。
+        //當然每一個連接的客戶端都有各自的執行緒來開啟"異步客戶端訊息處理"方法，不用擔心第一個客戶端會占用這個方法(主執行緒)。
         {
-            var buffer = new byte[1024]; //先宣告一個byte位元組陣列。
-            int bytesRead; //當接收到資料時，會同時返回取得的位元組數量，將此數存入此變數。
+            var buffer = new byte[1024]; //先宣告一個byte位元組陣列，用來存取訊息資料。
+            int bytesRead; //當接收到資料時，會同時返回取得的位元組數量，將此數量存入此變數。
 
             try
             {
                 // while迴圈來持續接收來自客戶端的訊息
-                while ((bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                while ((bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) != 0) //註解*1 (請拉到最底下)
                 {
-                    var receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim(); //將buffer的內容轉化UTF8編碼。
+                    var receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim(); //將buffer的內容轉化為人類可讀的UTF8編碼。
 
                     // 判斷訊息類型
                     if (receivedMessage.StartsWith("01")) //.StartsWith("") 用來檢查字符串是否以某個特定的字串為開頭，例如"01"。
@@ -66,7 +91,7 @@ class Program
                         // 01 開頭: 表示客戶端連接，後面的內容是暱稱
                         //Substring(2) 表示從字符串的第 2 個索引位置（即第 3 個字符 0、1、2）開始，截取剩下的所有字符，也就是去掉 "01" 的部分。
                         var nickname = receivedMessage.Substring(2);
-                        客戶端列表[nickname] = client; // 將客戶端與暱稱對應
+                        客戶端列表[nickname] = client; // 將客戶端與暱稱對應起來
                         Console.WriteLine($"{nickname} 已加入伺服器。");
 
                         // 回覆一個確認訊息給客戶端
@@ -92,26 +117,26 @@ class Program
                         var message = receivedMessage.Substring(2); // 去掉 "03" 的部分
                         string[] 用戶資料陣列 = message.Split(','); // 分割剩下的資訊
                         string 帳號 = 用戶資料陣列[0];
-                        string 密碼 = 用戶資料陣列[1];
+                        string 加密後密碼 = 加密密碼(用戶資料陣列[1]); // 使用雜湊函數加密密碼
                         string 電話 = 用戶資料陣列[2];
 
                         using (SQLiteConnection 連接 = new SQLiteConnection(資料庫位址字串))
                         {
                             連接.Open();
                             string sql指令 = @"INSERT INTO 測試資料表 (帳號, 密碼, 電話) 
-                           VALUES (@帳號, @密碼, @電話)"; //避免SQL注入攻擊。
+                           VALUES (@帳號, @密碼, @電話)"; // 用參數導入的方式寫入，避免SQL注入攻擊。
 
                             using (SQLiteCommand 指令 = new SQLiteCommand(sql指令, 連接))
                             {
                                 指令.Parameters.AddWithValue("@帳號", 帳號);
-                                指令.Parameters.AddWithValue("@密碼", 密碼);
+                                指令.Parameters.AddWithValue("@密碼", 加密後密碼); // 存入加密後的密碼
                                 指令.Parameters.AddWithValue("@電話", 電話);
 
                                 指令.ExecuteNonQuery();
                             }
                         }
 
-                        Console.WriteLine($"已將資料寫入資料庫: {message}");
+                        Console.WriteLine($"已將加密後的資料寫入資料庫: {帳號}, [加密的密碼], {電話}");
                     }
                     else
                     {
@@ -128,17 +153,17 @@ class Program
         Console.WriteLine($"{client.Client.RemoteEndPoint} 斷線。");
         client.Close();
     }
-   
-    private static string 取得客戶端暱稱(TcpClient client) //根據 TcpClient 取得暱稱
+
+    private static string 取得客戶端暱稱(TcpClient client) // 用來根據 TcpClient 取得暱稱
     {
-        foreach (var 遍歷用變數 in 客戶端列表) //以迴圈遍歷所有客戶端列表。
+        foreach (var 遍歷用變數 in 客戶端列表) //將客戶端列表(Dictionary)的key與Value傳給 遍歷用變數，並以迴圈遍歷所有客戶端列表。
         {
             if (遍歷用變數.Value == client) //當其中一個 客戶端列表的Value = 參數值client時，表示找到該對應.Key。
             {
-                return 遍歷用變數.Key; //暱稱值返回。
+                return 遍歷用變數.Key; //把該.Key 也就是暱稱值返回。
             }
         }
-        return "Unknown"; //若找不到對應的 Value，則返回"Unknown"。
+        return "Unknown"; //若找不到對應的.Value，則返回"Unknown"。
     }
 
     private static void HandleServerInput() //當伺服器管理員輸入 數字鍵1 時，可傳送自訂訊息給客戶。
@@ -168,14 +193,14 @@ class Program
             }
         }
     }
-    
+
     private static void SendMessageToClient(string nickname, string message) // 發送訊息到指定的客戶端用的自訂方法
     {
         if (客戶端列表.TryGetValue(nickname, out var 返回的客戶端值)) //用來檢查字典中是否存在指定的鍵（Key），並且在找到該鍵的情況下，同時返回其對應的值（Value）。
         {
             var networkStream = 返回的客戶端值.GetStream(); //指定某一客戶端來收發網路流，返回的客戶端值 是TcpClient物件。
-            var messageBytes = Encoding.UTF8.GetBytes(message); //將UTF8編碼，轉為Byte[] 。
-            networkStream.WriteAsync(messageBytes, 0, messageBytes.Length); //.WriteAsync()方法, 發送給客戶端。
+            var messageBytes = Encoding.UTF8.GetBytes(message); //將UTF8編碼的string參數值，轉為Byte[] 位元組數值。
+            networkStream.WriteAsync(messageBytes, 0, messageBytes.Length); //.WriteAsync()方法 將位元組陣列值發送給客戶端。
             Console.WriteLine($"訊息已傳送至 {nickname}: {message}");
         }
         else
