@@ -48,7 +48,7 @@ class Program
             Console.WriteLine($"TCP Server is running on port {port}...");
 
             // 啟動一個獨立任務來處理伺服器輸入，允許伺服器管理員（您）手動輸入來向特定客戶端發送訊息。
-            _ = Task.Run(() => HandleServerInput()); //註解*2 (請拉到最底下)
+            _ = Task.Run(() => HandleServerInput());
 
             while (true)
             {
@@ -81,7 +81,7 @@ class Program
             try
             {
                 // while迴圈來持續接收來自客戶端的訊息
-                while ((bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) != 0) //註解*1 (請拉到最底下)
+                while ((bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
                     var receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim(); //將buffer的內容轉化為人類可讀的UTF8編碼。
 
