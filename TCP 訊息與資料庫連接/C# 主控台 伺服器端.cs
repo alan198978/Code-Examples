@@ -12,7 +12,7 @@ class Program
     // 保存所有連接的客戶端, 用來將每個連接的客戶端的暱稱（string）與其對應的 TcpClient 進行配對
     private static Dictionary<string, TcpClient> 客戶端列表 = new Dictionary<string, TcpClient>();
 
-    static string 資料庫位址字串 = @"Data Source=C:\Users\wechli\Desktop\資料庫\測試資料庫.db;";
+    static string 資料庫位址字串 = @"Data Source=C:\Users\使用者名稱\Desktop\資料庫\測試資料庫.db;";
 
     // 密碼雜湊方法
     private static string 加密密碼(string 原始密碼)
