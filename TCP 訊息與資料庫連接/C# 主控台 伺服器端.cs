@@ -56,7 +56,6 @@ class Program
                 var client = await listener.AcceptTcpClientAsync();
                 Console.WriteLine("Client connected.");
 
-                // 異步客戶端訊息處理(client)：每當有新客戶端連接時，伺服器會啟動一個新的執行緒來處理該客戶端的通訊。
                 _ = Task.Run(() => 異步客戶端訊息處理(client));
             }
         }
@@ -73,9 +72,8 @@ class Program
     private static async Task 異步客戶端訊息處理(TcpClient client)
     {
         using (var networkStream = client.GetStream()) //.GetStream()將指定某一客戶端來收發網路流。
-        //當然每一個連接的客戶端都有各自的執行緒來開啟"異步客戶端訊息處理"方法，不用擔心第一個客戶端會占用這個方法(主執行緒)。
         {
-            var buffer = new byte[1024]; //先宣告一個byte位元組陣列，用來存取訊息資料。
+            var buffer = new byte[1024];
             int bytesRead; //當接收到資料時，會同時返回取得的位元組數量，將此數量存入此變數。
 
             try
@@ -83,7 +81,7 @@ class Program
                 // while迴圈來持續接收來自客戶端的訊息
                 while ((bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 {
-                    var receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim(); //將buffer的內容轉化為人類可讀的UTF8編碼。
+                    var receivedMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim(); //將buffer的內容轉為UTF8編碼。
 
                     // 判斷訊息類型
                     if (receivedMessage.StartsWith("01")) //.StartsWith("") 用來檢查字符串是否以某個特定的字串為開頭，例如"01"。
@@ -160,7 +158,7 @@ class Program
         {
             if (遍歷用變數.Value == client) //當其中一個 客戶端列表的Value = 參數值client時，表示找到該對應.Key。
             {
-                return 遍歷用變數.Key; //把該.Key 也就是暱稱值返回。
+                return 遍歷用變數.Key;
             }
         }
         return "Unknown"; //若找不到對應的.Value，則返回"Unknown"。
