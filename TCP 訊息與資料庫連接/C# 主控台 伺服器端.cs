@@ -43,8 +43,6 @@ class Server
         {
             while (true)
             {
-                //如果該次讀取的數據量大於 "設置的緩衝大小" 那剩下的數據會留到下次讀取，並不會被遺棄。
-                //而這次讀取的數據量大小則會返回一個整數，由 bytesRead 存入，這樣 UTF8.GetString(X, X, bytesRead)就可以得知此次的數據量大小。
                 int bytesRead = await stream.ReadAsync(設置的緩衝大小);
                 if (bytesRead == 0)
                     break;
