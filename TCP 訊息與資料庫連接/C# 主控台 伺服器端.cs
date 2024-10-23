@@ -9,7 +9,7 @@ class Server
     private static TcpListener? TCP監聽;
     private static Dictionary<string, TcpClient> 客戶列表 = new Dictionary<string, TcpClient>();
     private static object lockObject = new object(); //註解*1 (請下拉到最底觀看)
-    private const string 資料庫位址 = @"Data Source=C:\Users\wechli\Desktop\test.db;Cache=Shared";
+    private const string 資料庫位址 = @"Data Source=C:\Users\使用者名稱\Desktop\test.db;Cache=Shared";
 
     static async Task Main(string[] args)
     {
